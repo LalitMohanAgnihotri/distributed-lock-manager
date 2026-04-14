@@ -1,5 +1,6 @@
 import Lock from "../locks/lock.model.js";
 import { detectCycle } from "./waitGraph.js";
+import { getPolicy } from "../policies/policy.service.js";
 
 export async function scanDeadlocks() {
   const locks = await Lock.find();
@@ -12,8 +13,17 @@ export async function scanDeadlocks() {
     }
   }
 
+  const deadlock = detectCycle(graph);
+  const policy = await getPolicy();
+
+  if (deadlock && policy.deadlockStrategy === "auto") {
+    const victim = Object.keys(graph)[0];
+    await resolveDeadlock(victim);
+    return await scanDeadlocks();
+  }
+
   return {
-    deadlock: detectCycle(graph),
+    deadlock,
     graph,
   };
 }
