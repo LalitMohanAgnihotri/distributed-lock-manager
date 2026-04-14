@@ -1,3 +1,7 @@
-Write-Host 'Building containers...'
+Write-Host "Starting deployment..."
+
 docker compose up --build -d
-Write-Host 'App running at http://localhost:8080'
+
+Write-Host "Application running"
+Write-Host "Frontend: http://localhost:5173"
+Write-Host "Backend:  http://localhost:5000"
