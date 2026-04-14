@@ -1,0 +1,79 @@
+Distributed Lock Manager - API Test Guide
+
+Base URL:
+http://localhost:5000/api
+
+1. Health Check
+GET /health
+http://localhost:5000/api/health
+
+2. Acquire Lock
+POST /locks/acquire
+Body:
+{
+  "resource": "file-A",
+  "owner": "user1"
+}
+
+3. Conflict Test
+POST /locks/acquire
+Body:
+{
+  "resource": "file-A",
+  "owner": "user2"
+}
+
+4. Renew Lock
+POST /locks/renew
+Body:
+{
+  "resource": "file-A",
+  "owner": "user1"
+}
+
+5. Release Lock
+POST /locks/release
+Body:
+{
+  "resource": "file-A",
+  "owner": "user1"
+}
+
+6. Get All Locks
+GET /locks
+
+7. Metrics
+GET /metrics
+
+8. Deadlock Detection
+GET /deadlocks
+
+9. Resolve Deadlock
+POST /deadlocks/resolve
+Body:
+{
+  "owner": "user2"
+}
+
+10. Get Policy
+GET /policies
+
+11. Save Policy
+POST /policies
+Body:
+{
+  "ttlSeconds": 15,
+  "retryCount": 5,
+  "deadlockStrategy": "manual"
+}
+
+12. Logs (optional)
+GET /logs
+
+Best Demo Flow:
+1. Acquire lock
+2. Conflict test
+3. Release lock
+4. Deadlock scenario
+5. Resolve deadlock
+6. Check metrics
