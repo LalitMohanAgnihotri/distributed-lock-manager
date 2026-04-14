@@ -1,65 +1,86 @@
-Distributed Lock Manager - API Test Guide
+Distributed Lock Manager - API + Script Test Guide
 
 Base URL:
 http://localhost:5000/api
+
+
+==============================
+API TESTING
+==============================
 
 1. Health Check
 GET /health
 http://localhost:5000/api/health
 
+
 2. Acquire Lock
 POST /locks/acquire
+
 Body:
 {
   "resource": "file-A",
   "owner": "user1"
 }
 
+
 3. Conflict Test
 POST /locks/acquire
+
 Body:
 {
   "resource": "file-A",
   "owner": "user2"
 }
 
+
 4. Renew Lock
 POST /locks/renew
+
 Body:
 {
   "resource": "file-A",
   "owner": "user1"
 }
 
+
 5. Release Lock
 POST /locks/release
+
 Body:
 {
   "resource": "file-A",
   "owner": "user1"
 }
+
 
 6. Get All Locks
 GET /locks
 
+
 7. Metrics
 GET /metrics
+
 
 8. Deadlock Detection
 GET /deadlocks
 
+
 9. Resolve Deadlock
 POST /deadlocks/resolve
+
 Body:
 {
-  "owner": "user2"
+  "victimOwner": "user2"
 }
+
 
 10. Get Policy
 GET /policies
 
+
 11. Save Policy
-POST /policies
+PUT /policies
+
 Body:
 {
   "ttlSeconds": 15,
@@ -67,13 +88,124 @@ Body:
   "deadlockStrategy": "manual"
 }
 
+
 12. Logs (optional)
 GET /logs
 
-Best Demo Flow:
-1. Acquire lock
-2. Conflict test
-3. Release lock
-4. Deadlock scenario
-5. Resolve deadlock
-6. Check metrics
+
+
+==============================
+DEADLOCK DEMO FLOW
+==============================
+
+Step 1:
+POST /locks/acquire
+{
+  "resource": "file-A",
+  "owner": "user1"
+}
+
+Step 2:
+POST /locks/acquire
+{
+  "resource": "file-B",
+  "owner": "user2"
+}
+
+Step 3:
+POST /locks/acquire
+{
+  "resource": "file-B",
+  "owner": "user1"
+}
+
+Step 4:
+POST /locks/acquire
+{
+  "resource": "file-A",
+  "owner": "user2"
+}
+
+Now:
+GET /deadlocks
+
+Then resolve:
+POST /deadlocks/resolve
+{
+  "victimOwner": "user2"
+}
+
+
+
+==============================
+SCRIPT TESTING
+==============================
+
+Open PowerShell:
+
+cd scripts
+
+
+1. Health Check Script
+
+.\healthcheck.ps1
+
+Purpose:
+Checks backend server health
+
+
+2. Monitor Locks Script
+
+.\monitor-locks.ps1
+
+Purpose:
+Shows active locks, owners, waiting queue
+
+
+3. Detect Deadlocks Script
+
+.\detect-deadlocks.ps1
+
+Purpose:
+Shows deadlock status and wait graph
+
+
+4. Stale Locks Script
+
+.\stale-locks.ps1
+
+Purpose:
+Detects expired/stale locks
+
+
+5. Deploy Script
+
+.\deploy.ps1
+
+Purpose:
+Starts app using Docker
+
+
+6. Backup Script (Later)
+
+.\backup-db.ps1
+
+Purpose:
+Creates MongoDB backup using mongodump
+
+
+
+==============================
+BEST PRESENTATION FLOW
+==============================
+
+1. Run healthcheck script
+2. Acquire lock
+3. Conflict test
+4. Show monitor-locks script
+5. Create deadlock
+6. Run detect-deadlocks script
+7. Resolve deadlock
+8. Show metrics page
+9. Show policies page
+10. Explain backup + deploy scripts
