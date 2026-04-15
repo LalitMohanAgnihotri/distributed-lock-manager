@@ -3,11 +3,15 @@ import Card from "../components/Card";
 import { getMetrics } from "../api/metrics.api";
 
 export default function Metrics() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState({});
 
   const load = async () => {
-    const res = await getMetrics();
-    setData(res);
+    try {
+      const res = await getMetrics();
+      setData(res || {});
+    } catch {
+      setData({});
+    }
   };
 
   useEffect(() => {
@@ -15,8 +19,6 @@ export default function Metrics() {
     const id = setInterval(load, 3000);
     return () => clearInterval(id);
   }, []);
-
-  if (!data) return <div className="page-title">Loading...</div>;
 
   return (
     <div>
