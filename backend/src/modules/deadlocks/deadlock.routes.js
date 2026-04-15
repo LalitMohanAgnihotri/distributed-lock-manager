@@ -8,7 +8,7 @@ router.get("/", async (req, res, next) => {
     res.json(await scanDeadlocks());
   } catch (e) {
     next(e);
-  }
+  }    
 });
 
 router.post("/resolve", async (req, res, next) => {

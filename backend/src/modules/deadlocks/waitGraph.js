@@ -11,7 +11,7 @@ export function detectCycle(graph) {
     for (const next of graph[node] || []) {
       if (dfs(next)) return true;
     }
-
+        
     stack.delete(node);
     return false;
   }
