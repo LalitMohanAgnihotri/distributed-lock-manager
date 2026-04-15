@@ -3,6 +3,7 @@ import app from './app.js';
 import connectDB from './config/db.js';
 import { env } from './config/env.js';
 import { Server } from 'socket.io';
+import { startDeadlockJob } from './jobs/deadlockScan.job.js';
 
 await connectDB();
 
@@ -22,6 +23,8 @@ io.on('connection', (socket) => {
     console.log('Socket disconnected:', socket.id);
   });
 });
+
+startDeadlockJob(); 
 
 server.listen(env.port, () => {
   console.log(`Server running on ${env.port}`);

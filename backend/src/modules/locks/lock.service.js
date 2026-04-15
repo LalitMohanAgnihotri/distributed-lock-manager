@@ -89,7 +89,7 @@ export async function acquireWithRetry(resource, owner) {
 
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
-
+  
   return {
     success: false,
     status: 409,
@@ -129,27 +129,64 @@ export async function releaseLock(resource, owner) {
 export async function renewLock(resource, owner) {
   const ttlMs = await getTtlMs();
 
-  metrics.renewals++;
+  const lock = await Lock.findOne({ resource, owner });
 
-  const updated = await Lock.findOneAndUpdate(
-    { resource, owner },
-    { expiresAt: new Date(Date.now() + ttlMs) },
-    { new: true }
-  );
+  if (!lock) {
+    return null;
+  }
+
+  // if expired already -> fail
+  if (existing.expiresAt <= now) {
+  metrics.expiredReclaims++;
+  metrics.renewals++; // new owner gets fresh lease
+
+  existing.owner = owner;
+  existing.waiting = [];
+  existing.expiresAt = expiresAt;
+
+  await existing.save();
 
   emitUpdate("locks:update");
   emitUpdate("metrics:update");
 
-  return updated;
+  return {
+    success: true,
+    lock: existing,
+    expiredReassigned: true,
+  };
+}
+
+  metrics.renewals++;
+
+  lock.expiresAt = new Date(Date.now() + ttlMs);
+  await lock.save();
+
+  emitUpdate("locks:update");
+  emitUpdate("metrics:update");
+
+  return lock;
 }
 
 export async function listLocks() {
   const now = new Date();
+  const ttlMs = await getTtlMs();
 
-  // delete expired locks first
-  await Lock.deleteMany({
-    expiresAt: { $lte: now },
+  const expiredLocks = await Lock.find({
+    expiresAt: { $lte: now }
   });
+
+  for (const lock of expiredLocks) {
+    if (lock.waiting.length > 0) {
+      metrics.expiredReclaims++;
+
+      lock.owner = lock.waiting.shift();
+      lock.expiresAt = new Date(Date.now() + ttlMs);
+
+      await lock.save();
+    } else {
+      await Lock.deleteOne({ _id: lock._id });
+    }
+  }
 
   emitUpdate("locks:update");
   emitUpdate("metrics:update");

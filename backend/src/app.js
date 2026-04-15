@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import { requestId } from './middleware/requestId.middleware.js';
