@@ -128,6 +128,66 @@ POST /locks/acquire
 
 Now:
 GET /deadlocks
++----------------------+
+            |   Read all Locks     |
+            |   from MongoDB       |
+            +----------+-----------+
+                       |
+                       v
+            +----------------------+
+            | For each Lock record |
+            | resource, owner,     |
+            | waiting[]            |
+            +----------+-----------+
+                       |
+                       v
+        +----------------------------------+
+        | Is waiting queue empty?          |
+        +-----------+----------------------+
+                    | Yes
+                    v
+              Skip this lock
+                    |
+                    | No
+                    v
+     +--------------------------------------+
+     | For each waiter in waiting[]         |
+     +----------------+---------------------+
+                      |
+                      v
+     +--------------------------------------+
+     | Add node for waiter if not exists    |
+     +----------------+---------------------+
+                      |
+                      v
+     +--------------------------------------+
+     | Create edge: waiter  ->  owner       |
+     | (waiter is waiting for owner)        |
+     +----------------+---------------------+
+                      |
+                      v
+          Repeat for all waiters / locks
+                      |
+                      v
+     +--------------------------------------+
+     | Final Graph Ready                   |
+     | Example:                            |
+     | user2 -> user1                      |
+     | user1 -> user3                      |
+     +----------------+---------------------+
+                      |
+                      v
+     +--------------------------------------+
+     | Run DFS Cycle Detection             |
+     +-----------+--------------------------+
+                 |
+        +--------+--------+
+        |                 |
+        v                 v
++---------------+   +------------------+
+| Cycle Found   |   | No Cycle         |
+| Deadlock =Yes |   | Deadlock = No    |
++---------------+   +------------------+
 
 Then resolve:
 POST /deadlocks/resolve
