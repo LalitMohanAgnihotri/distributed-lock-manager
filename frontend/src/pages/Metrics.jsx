@@ -16,7 +16,7 @@ export default function Metrics() {
 
   useEffect(() => {
     load();
-    const id = setInterval(load, 3000);
+    const id = setInterval(load,3000);
     return () => clearInterval(id);
   }, []);
 
