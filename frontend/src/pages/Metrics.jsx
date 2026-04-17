@@ -5,7 +5,7 @@ import { getMetrics } from "../api/metrics.api";
 export default function Metrics() {
   const [data, setData] = useState({});
 
-  const load = async () => {
+  const load = async () =>{
     try {
       const res = await getMetrics();
       setData(res || {});
