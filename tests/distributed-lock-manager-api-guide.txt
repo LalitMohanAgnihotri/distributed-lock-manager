@@ -269,3 +269,5 @@ BEST PRESENTATION FLOW
 8. Show metrics page
 9. Show policies page
 10. Explain backup + deploy scripts
+
+Build with efforts and teamwork

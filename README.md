@@ -1,161 +1,197 @@
-# Distributed Lock Manager
+# 🚀 Distributed Lock Manager (Enterprise-Style Backend System)
 
-A production-inspired backend system that manages distributed resource locking using **Node.js**, **Express**, and **MongoDB**.  
-It prevents concurrent access conflicts, supports lock expiration, detects deadlocks, and provides an admin dashboard for real-time monitoring and control.
+A **high-reliability distributed locking system** designed to coordinate concurrent access to shared resources across services. Built with scalability, fault tolerance, and observability in mind.
 
----
-
-# Project Overview
-
-In distributed systems, multiple users/services may try to access the same shared resource at the same time.  
-Without coordination, this can cause:
-
-- Data corruption
-- Race conditions
-- Inconsistent writes
-- Resource starvation
-- Deadlocks
-
-This project solves those problems by implementing a centralized lock manager.
+This project simulates real-world backend infrastructure patterns used in **distributed systems, microservices, and cloud platforms**.
 
 ---
 
-# Core Features
+## 📌 Why This Project Matters
 
-## Lock Management
+Modern distributed systems frequently face **concurrency challenges** when multiple services attempt to modify the same resource.
 
-- Acquire lock on a resource
-- Release lock
-- Renew lock lease
-- Ownership validation
-- Waiting queue for blocked requests
+Without proper coordination, systems suffer from:
 
-## Lock Expiration (TTL)
+* ❌ Race conditions
+* ❌ Data inconsistency
+* ❌ Deadlocks
+* ❌ Resource starvation
+* ❌ System instability
 
-Each lock has a configurable expiry time.
-
-If the owner crashes or never releases the lock, the lock expires automatically and can be reassigned.
-
-## Conflict Handling
-
-If another owner requests a locked resource:
-
-- Request is denied
-- Conflict metric increases
-- Owner is added to waiting queue
-
-## Deadlock Detection
-
-System builds a **wait-for graph** and detects circular dependencies.
-
-Example:
-
-user1 waits for user2  
-user2 waits for user1
-
-=> Deadlock detected
-
-## Deadlock Resolution
-
-### Manual Mode
-Admin selects victim process and resolves it.
-
-### Automatic Mode
-System detects deadlock and auto-selects a victim based on policy.
-
-## Policy Management
-
-Admin can configure:
-
-- TTL Seconds
-- Retry Count
-- Deadlock Strategy
-
-## Metrics Dashboard
-
-Real-time monitoring of:
-
-- Active locks
-- Acquire requests
-- Conflicts
-- Releases
-- Renewals
-- Expired reclaims
-- Server uptime
-
-## Operations Scripts
-
-PowerShell automation scripts included for:
-
-- Health checks
-- Lock monitoring
-- Deadlock detection
-- Stale lock inspection
-- Deployment
-- Backup (prepared)
+This project introduces a **centralized lock orchestration layer** that ensures safe and predictable access to shared resources.
 
 ---
 
-# Tech Stack
+## 🧠 Key Capabilities
 
-## Backend
+### 🔐 Distributed Lock Lifecycle Management
 
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-
-## Frontend Admin Panel
-
-- React
-- Vite
-- Axios
-- CSS
-
-## DevOps / Tools
-
-- PowerShell Scripts
-- Git
-- Docker (deployment script ready)
-- Postman
+* Atomic lock acquisition
+* Secure lock release
+* Lease renewal mechanism
+* Ownership validation
+* FIFO-based waiting queue
 
 ---
 
-# System Architecture
+### ⏳ Intelligent Lock Expiration (TTL)
 
-```text
-Client / Postman / Admin Panel
-            |
-            v
-        Express API
-            |
-            v
-     Lock Service Logic
-            |
-            v
-        MongoDB Store
- 
- 
+* Configurable lease duration
+* Automatic recovery of abandoned locks
+* Prevents resource blocking due to crashed clients
+
+---
+
+### ⚔️ Conflict Resolution Engine
+
+* Detects concurrent acquisition attempts
+* Rejects conflicting requests safely
+* Tracks contention metrics
+* Maintains queue of blocked clients
+
+---
+
+### 🔄 Deadlock Detection System
+
+* Builds dynamic **Wait-For Graphs**
+* Detects circular dependencies in real time
+
+**Example Scenario:**
+
+```
+Client A → waiting for Client B
+Client B → waiting for Client A
+
+➡ Deadlock Detected
+```
+
+---
+
+### 🛠 Deadlock Resolution Strategies
+
+#### Manual Mode
+
+* Admin selects victim process
+* Fine-grained control
+
+#### Automatic Mode
+
+* System selects victim using predefined policy
+* Ensures minimal disruption
+
+---
+
+### ⚙️ Policy Configuration Engine
+
+Runtime-configurable system behavior:
+
+* Lock TTL duration
+* Retry attempts
+* Deadlock resolution strategy
+
+---
+
+### 📊 Observability & Metrics Dashboard
+
+Real-time insights into system behavior:
+
+* Active locks
+* Lock acquisition attempts
+* Conflict frequency
+* Release operations
+* Renewal activity
+* Expired lock reclamation
+* Server uptime
+
+---
+
+### 🧪 Operational Automation (DevOps Ready)
+
+Prebuilt scripts for operational workflows:
+
+* Health monitoring
+* Lock inspection
+* Deadlock detection
+* Stale resource cleanup
+* Deployment automation
+* Database backup (extensible)
+
+---
+
+## 🏗 System Architecture
+
+```
+         ┌─────────────────────────────┐
+         │   Clients / Admin Panel     │
+         │   (UI / Postman / Scripts)  │
+         └─────────────┬───────────────┘
+                       │
+                       ▼
+              ┌─────────────────┐
+              │   Express API   │
+              └────────┬────────┘
+                       │
+                       ▼
+           ┌──────────────────────┐
+           │ Lock Service Engine  │
+           │ - Conflict Handling  │
+           │ - Deadlock Detection │
+           │ - TTL व्यवस्थापन     │
+           └────────┬─────────────┘
+                    │
+                    ▼
+             ┌──────────────┐
+             │   MongoDB    │
+             │ Persistence  │
+             └──────────────┘
+```
+
+---
+
+## 🧰 Technology Stack
+
+### Backend
+
+* Node.js (Runtime)
+* Express.js (API Layer)
+* MongoDB (Data Store)
+* Mongoose (ODM)
+
+### Frontend (Admin Dashboard)
+
+* React (UI Framework)
+* Vite (Build Tool)
+* Axios (HTTP Client)
+
+### DevOps & Tooling
+
+* PowerShell Automation
+* Docker (Deployment Ready)
+* Git Version Control
+* Postman (API Testing)
+
+---
+
+## 📁 Project Structure
+
+```
 distributed-lock-manager/
 │
 ├── backend/
-│   ├── src/
-│   │   ├── modules/
-│   │   │   ├── locks/
-│   │   │   ├── deadlocks/
-│   │   │   ├── policies/
-│   │   │   └── logs/
-│   │   ├── middleware/
-│   │   ├── config/
-│   │   ├── utils/
-│   │   └── server.js
+│   ├── modules/
+│   │   ├── locks/
+│   │   ├── deadlocks/
+│   │   ├── policies/
+│   │   └── logs/
+│   ├── middleware/
+│   ├── config/
+│   └── utils/
 │
 ├── frontend/
-│   └── src/
-│       ├── pages/
-│       ├── api/
-│       ├── components/
-│       └── styles/
+│   ├── pages/
+│   ├── components/
+│   ├── api/
+│   └── styles/
 │
 ├── scripts/
 │   ├── deploy.ps1
@@ -166,58 +202,103 @@ distributed-lock-manager/
 │   └── backup-db.ps1
 │
 └── README.md
+```
 
-## Quick Start
+---
 
-### Clone Repository
+## ⚡ Getting Started
+
+### Clone the Repository
 
 ```bash
 git clone https://github.com/LalitMohanAgnihotri/distributed-lock-manager
 cd distributed-lock-manager
+```
 
-Backend
+---
+
+### ▶ Backend Setup
+
+```bash
 cd backend
 npm install
 npm run dev
-Runs on: http://localhost:5000
+```
 
-Frontend
+Runs on: `http://localhost:5000`
+
+---
+
+### 💻 Frontend Setup
+
+```bash
 cd frontend
 npm install
 npm run dev
-Runs on: http://localhost:5173
+```
 
-Core APIs
-Base URL: http://localhost:5000/api
+Runs on: `http://localhost:5173`
 
-| Method | Endpoint             | Description      |
-| ------ | -------------------- | ---------------- |
-| GET    | `/health`            | Server health    |
-| POST   | `/locks/acquire`     | Acquire lock     |
-| POST   | `/locks/release`     | Release lock     |
-| POST   | `/locks/renew`       | Renew lock       |
-| GET    | `/locks`             | List locks       |
-| GET    | `/metrics`           | System metrics   |
-| GET    | `/deadlocks`         | Detect deadlocks |
-| POST   | `/deadlocks/resolve` | Resolve deadlock |
-| GET    | `/policies`          | Get policy       |
-| PUT    | `/policies`          | Update policy    |
+---
 
-Scripts
+## 🔗 API Reference
+
+Base URL: `http://localhost:5000/api`
+
+| Method | Endpoint             | Description          |
+| ------ | -------------------- | -------------------- |
+| GET    | `/health`            | Service health check |
+| POST   | `/locks/acquire`     | Acquire lock         |
+| POST   | `/locks/release`     | Release lock         |
+| POST   | `/locks/renew`       | Renew lock lease     |
+| GET    | `/locks`             | List active locks    |
+| GET    | `/metrics`           | System metrics       |
+| GET    | `/deadlocks`         | Detect deadlocks     |
+| POST   | `/deadlocks/resolve` | Resolve deadlock     |
+| GET    | `/policies`          | Fetch policy config  |
+| PUT    | `/policies`          | Update policy config |
+
+---
+
+## 🧪 Automation Scripts
+
+```powershell
 cd scripts
+
 .\healthcheck.ps1
 .\monitor-locks.ps1
 .\detect-deadlocks.ps1
 .\stale-locks.ps1
 .\deploy.ps1
+```
 
-Future Improvements
-Redis SETNX lock backend
-Authentication & roles
-WebSocket live updates
-Cloud deployment
-CI/CD pipeline
-Unit tests
+---
 
-Author
-Lalit Mohan Agnihotri
+## 🔮 Future Enhancements
+
+* Redis-based distributed locking (SETNX)
+* Role-based authentication & access control
+* WebSocket-based real-time updates
+* Cloud-native deployment (AWS / GCP)
+* CI/CD pipeline integration
+* Unit & integration testing suite
+
+---
+
+## 👨‍💻 Author
+
+**Lalit Mohan Agnihotri**
+**Kohinoor Tiwari**
+
+---
+
+## 🏁 Final Note
+
+This project demonstrates core concepts of:
+
+* Distributed coordination
+* Concurrency control
+* Fault tolerance
+* Backend system design
+
+Designed not just as an academic project, but as a **foundation for real-world scalable systems**.
