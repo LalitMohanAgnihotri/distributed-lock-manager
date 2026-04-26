@@ -10,7 +10,7 @@ export async function scanDeadlocks() {
     for (const waiter of lock.waiting) {
       graph[waiter] = graph[waiter] || [];
       graph[waiter].push(lock.owner);
-    }
+    }     
   }
 
   const deadlock = detectCycle(graph);
